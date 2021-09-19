@@ -2,14 +2,16 @@ package main
 
 import (
 	"crypto/md5"
+	"crypto/sha512"
 	"encoding/hex"
+	"fmt"
+	"github.com/anaskhan96/go-password-encoder"
 	"gorm.io/gorm/schema"
 	"io"
 	"log"
+	"mall/mall-user/model"
 	"os"
 	"time"
-
-	"mall/mall-user/model"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -48,5 +50,19 @@ func main() {
 		panic(err)
 	}
 
-	_ = db.AutoMigrate(&model.User{}) //此处应该有sql语句
+	//_ = db.AutoMigrate(&model.User{})
+
+	options := &password.Options{16, 100, 32, sha512.New}
+	salt, encodedPwd := password.Encode("123456", options)
+	newPassword := fmt.Sprintf("$pbkdf2-sha512$%s$%s", salt, encodedPwd)
+	fmt.Println(newPassword)
+
+	for i := 0; i < 10; i++ {
+		user := model.User{
+			NickName: fmt.Sprintf("test%d", i),
+			Mobile:   fmt.Sprintf("1525662565%d", i),
+			Password: newPassword,
+		}
+		db.Save(&user)
+	}
 }
