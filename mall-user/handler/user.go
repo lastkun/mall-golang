@@ -33,7 +33,7 @@ func ModelToResponse(user model.User) proto.UserInfoResponse {
 		Mobile:   user.Mobile,
 	}
 	if user.Birthday != nil {
-		userInfoResp.Birthday = int32(user.Birthday.Unix())
+		userInfoResp.Birthday = uint64(user.Birthday.Unix())
 	}
 	return userInfoResp
 }

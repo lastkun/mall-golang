@@ -39,7 +39,7 @@ message AddUserRequest {
 message UpdateUserRequest {
     int32 id = 1;
     string nickname = 2;
-    int32  birthday = 3;
+    uint64 birthday = 3;
     int32  gender = 4;
 }
 
@@ -55,7 +55,7 @@ message UserInfoResponse {
     string mobile = 3;
     string nickname = 4;
     int32  gender = 5;
-    int32  birthday = 6;
+    uint64 birthday = 6;
     int32  role = 7;
 }
 
