@@ -6,7 +6,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"mall/mall-user/proto"
+	"mall/user-service/proto"
 )
 
 var userClient proto.UserClient

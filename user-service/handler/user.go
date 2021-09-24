@@ -13,9 +13,9 @@ import (
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 
-	"mall/mall-user/global"
-	"mall/mall-user/model"
-	"mall/mall-user/proto"
+	"mall/user-service/global"
+	"mall/user-service/model"
+	"mall/user-service/proto"
 )
 
 type UserServer struct {

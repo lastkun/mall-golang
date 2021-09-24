@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm/schema"
 	"io"
 	"log"
-	"mall/mall-user/model"
+	"mall/user-service/model"
 	"os"
 	"time"
 
