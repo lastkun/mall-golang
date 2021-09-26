@@ -7,6 +7,7 @@ import (
 
 var (
 	DB           *gorm.DB
+	NacosConfig  = &config.NacosConfig{}
 	ServerConfig = &config.ServerConfig{}
 )
 
