@@ -11,6 +11,7 @@ import (
 	"mall/goods-service/proto"
 )
 
+//获取分类列表
 func (g *GoodsServer) GetAllCategorysList(ctx context.Context, req *emptypb.Empty) (*proto.CategoryListResponse, error) {
 	categoryListResp := proto.CategoryListResponse{}
 	var total int64
@@ -32,8 +33,37 @@ func (g *GoodsServer) GetAllCategorysList(ctx context.Context, req *emptypb.Empt
 
 	return &categoryListResp, nil
 }
-func (g *GoodsServer) GetSubCategory(context.Context, *proto.CategoryListRequest) (*proto.SubCategoryListResponse, error) {
 
+//获取子分类 不加载多级分类
+func (g *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryListRequest) (*proto.SubCategoryListResponse, error) {
+	subCategoryResp := proto.SubCategoryListResponse{}
+	var category model.Category
+	var subCategoryListResp []*proto.CategoryInfoResponse
+	if result := global.DB.First(&category, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "该分类不存在")
+	}
+
+	subCategoryResp.Info = &proto.CategoryInfoResponse{
+		Id:             category.ID,
+		Name:           category.Name,
+		ParentCategory: category.ParentCategoryID,
+		Level:          category.Level,
+		IsTab:          category.IsTab,
+	}
+
+	var subCategoryList []model.Category
+	global.DB.Where(&model.Category{ParentCategoryID: req.Id}).Find(&subCategoryList)
+	for _, subCategory := range subCategoryList {
+		subCategoryListResp = append(subCategoryListResp, &proto.CategoryInfoResponse{
+			Id:             subCategory.ID,
+			Name:           subCategory.Name,
+			ParentCategory: subCategory.ParentCategoryID,
+			Level:          subCategory.Level,
+			IsTab:          subCategory.IsTab,
+		})
+	}
+
+	return &subCategoryResp, nil
 }
 
 //CreateCategory(context.Context, *CategoryInfoRequest) (*CategoryInfoResponse, error)
