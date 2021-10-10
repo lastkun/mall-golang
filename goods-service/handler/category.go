@@ -66,6 +66,50 @@ func (g *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryLis
 	return &subCategoryResp, nil
 }
 
-//CreateCategory(context.Context, *CategoryInfoRequest) (*CategoryInfoResponse, error)
-//DeleteCategory(context.Context, *DeleteCategoryRequest) (*emptypb.Empty, error)
-//UpdateCategory(context.Context, *CategoryInfoRequest) (*emptypb.Empty, error)
+func (g *GoodsServer) CreateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*proto.CategoryInfoResponse, error) {
+	newCategory := model.Category{}
+	newCategory.Name = req.Name
+	newCategory.Level = req.Level
+	newCategory.IsTab = req.IsTab
+	if req.Level != 1 {
+		newCategory.ParentCategoryID = req.ParentCategory
+	}
+
+	result := global.DB.Create(&newCategory)
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "新增分类出现错误"+result.Error.Error())
+	}
+	return &proto.CategoryInfoResponse{Id: newCategory.ID}, nil
+}
+func (g *GoodsServer) DeleteCategory(ctx context.Context, req *proto.DeleteCategoryRequest) (*emptypb.Empty, error) {
+	if result := global.DB.Delete(&model.Category{}, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "该分类不存在"+result.Error.Error())
+	}
+	return &emptypb.Empty{}, nil
+}
+func (g *GoodsServer) UpdateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*emptypb.Empty, error) {
+	newCategory := model.Category{}
+	if result := global.DB.First(&newCategory, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "该分类不存在"+result.Error.Error())
+	}
+	if req.Name != "" {
+		newCategory.Name = req.Name
+	}
+	if req.ParentCategory != 0 {
+		newCategory.ParentCategoryID = req.ParentCategory
+	}
+	if req.Level != 0 {
+		newCategory.Level = req.Level
+	}
+	if req.IsTab {
+		newCategory.IsTab = req.IsTab
+	}
+
+	result := global.DB.Save(&newCategory)
+
+	if result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "更新分类出现错误"+result.Error.Error())
+	}
+
+	return &emptypb.Empty{}, nil
+}
